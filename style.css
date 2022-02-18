@@ -1,0 +1,3 @@
+a:link, a:visited {color: blue; text-decoration: none; }
+a:hover {color: blue; text-decoration: underline; }
+body {margin: auto; }

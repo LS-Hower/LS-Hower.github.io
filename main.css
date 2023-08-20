@@ -1,0 +1,18 @@
+/* 2023-08-20  main.css */
+
+a {
+	color: #ff0000;
+}
+
+a:link, a:visited {
+	text-decoration-line: none;
+}
+
+a:hover {
+	text-decoration-line: underline;
+}
+
+body {
+	color: #efefef;
+	background-color: #181a1b;
+}

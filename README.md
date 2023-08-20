@@ -1,2 +1,2 @@
 # LS-Hower.github.io
-LS Hower 的 Github Pages
+LS Hower 的个人页面，Github Pages。

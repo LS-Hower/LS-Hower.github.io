@@ -9,6 +9,7 @@ title: 朋友们
 - [_WA自动机](https://wa-automaton.github.io/)
 - [Random Fly](https://randfly.site/)
 - [libfsx](https://blog.libfsx.org/)
+- [zaochen](https://zaochen.netlify.app/)
 - [Fisher4124](https://fisher4124.github.io/)
 - [GBYUJG](https://kaku.1212967.xyz/)
 - [1212967](https://1212967.xyz/blog/)

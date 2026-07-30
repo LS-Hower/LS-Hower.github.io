@@ -2,6 +2,10 @@
 title: 读书
 date: 2024-02-04
 updated: 2024-02-04
+categories:
+  - 记事
+tags:
+  - "前 Hexo 时期"
 ---
 
 ## 关于计算机的

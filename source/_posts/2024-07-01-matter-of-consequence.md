@@ -2,6 +2,10 @@
 title: 正经事
 date: 2024-07-01
 updated: 2024-07-01
+categories:
+  - 记事
+tags:
+  - "前 Hexo 时期"
 ---
 
 ## 正经事

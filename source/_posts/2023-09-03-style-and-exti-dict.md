@@ -2,6 +2,10 @@
 title: 网站风格与 I 区码表
 date: 2023-09-03
 updated: 2023-09-03
+categories:
+  - 记事
+tags:
+  - "前 Hexo 时期"
 ---
 
 ## 网站风格

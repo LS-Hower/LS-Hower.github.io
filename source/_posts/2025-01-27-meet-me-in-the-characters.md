@@ -2,6 +2,10 @@
 title: 觅我于字符之间
 date: 2025-01-27
 updated: 2025-01-27
+categories:
+  - 记事
+tags:
+  - "前 Hexo 时期"
 ---
 
 大一上学期早已结束，现在是寒假。

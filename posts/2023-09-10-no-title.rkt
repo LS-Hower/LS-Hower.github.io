@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../generate-tools.rkt")
+(require "../tools/notation.rkt")
 
 (provide page)
 
@@ -17,7 +17,7 @@
      (hyperlink
       "THBWiki 页面"
       "https://cache.thwiki.cc/%E6%AD%8C%E8%AF%8D:%E5%8F%99%E8%81%96%E3%81%AE%E3%82%AF%E3%82%AA%E3%83%AA%E3%82%A2_%EF%BD%9ESubterranean_rose%EF%BD%9E")
-     ("）。不过这首歌的 PV 好像找不到了，我记得几个月前网上还有的。")))
+     "）。不过这首歌的 PV 好像找不到了，我记得几个月前网上还有的。"))
    (section
     "以后学点新东西？"
     (paragraph

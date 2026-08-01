@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../generate-tools.rkt")
+(require "../tools/notation.rkt")
 
 (provide page)
 

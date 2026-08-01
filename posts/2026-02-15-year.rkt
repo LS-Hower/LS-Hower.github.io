@@ -1,0 +1,44 @@
+#lang racket
+
+(require "../generate-tools.rkt")
+
+(provide page)
+
+(define page
+  (document
+   (metadata
+    #:title "年"
+    #:publish-date (day-date 2026 2 15))
+   (paragraph
+    "又过了一年。")
+   (paragraph
+    "转进了计算机学院。")
+   (paragraph
+    "遇见了好友三三。")
+   (paragraph
+    "在课内越来越摆了。")
+   (paragraph
+    "水群也越来越少了。")
+   (paragraph
+    "技术上没有什么长进。")
+   (paragraph
+    "每天都在刷视频。")
+   (horizontal-line)
+   (paragraph
+    "扩展区五笔码表的项目仍然没在更新。")
+   (paragraph
+    "去年（2025 年）12 月听了一些线下的讲座，有 Bjarne 在清华大学的演讲（"
+    (hyperlink
+     "知乎有人记录了全文"
+     "https://zhuanlan.zhihu.com/p/1990476964423820269")
+    "），以及 2025 全球 C++ 及系统软件技术大会。听到了一些比较前沿的东西。但我基本功还不扎实。")
+   (paragraph
+    "最近又想自己写一个 SICP 解题集了。在 LaTeX 和 Markdown 之间选择了"
+    (hyperlink
+     "Scribble"
+     "https://docs.racket-lang.org/scribble/")
+    "。很怀疑能不能坚持下去，感觉现在的我甚至会在读 Scribble 教程的时候就放弃了。不过也不一定。")
+   (paragraph
+    "想知道在什么时候，遇见"
+    (with-delete-line "某个我内心神秘事件（划去）")
+    "什么事才能让我重新振作起来。")))

@@ -270,7 +270,7 @@
    (section
     "在一些编程语言中的情况"
     (paragraph
-     (bold "TODO: 排版目前有问题。"))
+     (bold "TODO: 排版目前有问题。表格暂时先不显示。"))
     #;
     (table
      #:align '(center center center center)

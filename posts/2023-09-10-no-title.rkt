@@ -8,7 +8,8 @@
   (document
    (metadata
     #:title "无题"
-    #:publish-date (day-date 2023 9 10))
+    #:publish-date (day-date 2023 9 10)
+    #:update-date (day-date 2026 8 1))
    (paragraph
     (bold "2026-08-01 更新：")
     "文中的链接已失效。可以看这个链接："

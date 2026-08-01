@@ -8,7 +8,8 @@
   (document
    (metadata
     #:title "觅我于字符之间"
-    #:publish-date (day-date 2025 1 27))
+    #:publish-date (day-date 2025 1 27)
+    #:update-date (day-date 2026 8 1))
    (paragraph
     (bold "2026-08-01 更新：")
     "题目链接已失效。可以看该题目的解答页面："

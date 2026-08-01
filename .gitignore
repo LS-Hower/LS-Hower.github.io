@@ -1,1 +1,13 @@
+# Racket .gitignore
+
+.DS_Store
+compiled/
+/doc/
+*~
+*.bak
+\#*
+.\#*
+
+# VS Code
+
 .vscode/

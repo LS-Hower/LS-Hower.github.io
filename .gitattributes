@@ -1,3 +1,4 @@
 * text=auto eol=lf
-site/* linguist-generated
-blog/* linguist-generated
+site/** linguist-generated
+blog/** linguist-generated
+/index.html

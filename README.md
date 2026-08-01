@@ -10,6 +10,7 @@ LS Hower 的个人页面，通过 GitHub Pages 搭建。
 
 - `posts/*.rkt` ：文章页源代码
 - `pages/*.rkt` ：站点页源代码（含 `index.rkt` ）
+- `assets/` ：图片、代码等资源
 
 在仓库根目录运行：
 
@@ -24,3 +25,5 @@ racket tools/build.rkt
 - `site/*.html` ：站点页
 
 构建前会清理这些位置中本次未生成的遗留 `.html` 。
+
+部分文章用 `terminal-output` 在构建时运行 Python 脚本（如 `(terminal-output #:run "python divmod_plots.py" #:cwd "assets")`）并把彩色输出渲染进页面，因此这些文章的构建依赖对应的 Python 环境。

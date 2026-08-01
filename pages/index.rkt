@@ -9,11 +9,11 @@
    (metadata
     #:title "主页"
     #:numbered #f)
-   (image "images/gan.png"
+   (image "assets/gan.png"
           #:alt "常用头像“绀”"
           #:title "常用头像“绀”"
-          #:width 300
-          #:height 300)
+          #:width 18.75
+          #:height 18.75)
    (paragraph
      "欢迎。")
    (paragraph

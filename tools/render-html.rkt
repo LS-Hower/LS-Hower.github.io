@@ -139,6 +139,145 @@
                     (escape-text (flat-page-rec-title p)))))
    "</ul>\n"))
 
+;; ---------- 代码 / 表格 / 终端输出 ----------
+
+;; code-block 内容：优先 #:from-file（相对站点根），否则用内联 code
+(define (code-block-content b)
+  (define from-file (node-code-block-from-file b))
+  (cond
+    [from-file (file->string (string->path from-file))]
+    [(node-code-block-code b) (node-code-block-code b)]
+    [else (error "render-html: code-block 既没有 code 也没有 #:from-file" b)]))
+
+(define (row-cells r)
+  (cond
+    [(node-row? r) (node-row-cells r)]
+    [(node-header-row? r) (node-header-row-cells r)]
+    [else (error "render-html: 期望 row 或 header-row，得到" r)]))
+
+(define (render-cell-lines lines)
+  (string-join
+   (for/list ([line (in-list lines)])
+     (if (list? line) (render-inlines line) (render-inline line)))
+   "<br>"))
+
+(define (table-align align-list col)
+  (if (and align-list (< col (length align-list)))
+      (list-ref align-list col)
+      'left))
+
+(define (align-attr a)
+  (case a
+    [(left) "text-align:left"]
+    [(center) "text-align:center"]
+    [(right) "text-align:right"]
+    [else (error "render-html: 未知的对齐" a)]))
+
+;; 图片尺寸：数字解释为 em（相对文字高度），字符串按 CSS 原样
+(define (css-length v)
+  (if (number? v) (format "~aem" v) v))
+
+(define (image-size-style b)
+  (define parts
+    (filter identity
+            (list (and (node-image-width b)
+                       (format "width:~a" (css-length (node-image-width b))))
+                  (and (node-image-height b)
+                       (format "height:~a" (css-length (node-image-height b)))))))
+  (if (empty? parts) "" (format " style=\"~a\"" (string-join parts ";"))))
+
+(define (render-table t)
+  (define align-list (node-table-align t))
+  (define headers (filter node-header-row? (node-table-rows t)))
+  (define bodies (filter node-row? (node-table-rows t)))
+  (define (render-row r header?)
+    (define tag (if header? "th" "td"))
+    (string-append
+     "<tr>\n"
+     (apply string-append
+            (for/list ([c (in-list (row-cells r))] [col (in-naturals)])
+              (format "  <~a style=\"~a\">~a</~a>\n"
+                      tag
+                      (align-attr (table-align align-list col))
+                      (render-cell-lines (node-cell-lines c))
+                      tag)))
+     "</tr>\n"))
+  (string-append
+   "<table>\n"
+   (if (empty? headers)
+       ""
+       (string-append "<thead>\n"
+                      (apply string-append (map (lambda (r) (render-row r #t)) headers))
+                      "</thead>\n"))
+   (if (empty? bodies)
+       ""
+       (string-append "<tbody>\n"
+                      (apply string-append (map (lambda (r) (render-row r #f)) bodies))
+                      "</tbody>\n"))
+   "</table>\n"))
+
+;; ---------- 终端输出（ANSI SGR） ----------
+
+(define ansi-fg
+  (hash 30 "#000000" 31 "#cd3131" 32 "#00bc00" 33 "#949800"
+        34 "#0451a5" 35 "#bc05bc" 36 "#0598bc" 37 "#555555"
+        90 "#666666" 91 "#cd3131" 92 "#14ce14" 93 "#b5ba00"
+        94 "#0451a5" 95 "#bc05bc" 96 "#0598bc" 97 "#a5a5a5"))
+
+;; 解析一串 SGR 参数，返回新的前景色（#f = 无/重置）
+(define (sgr-result code-str current)
+  (define codes (filter (lambda (s) (not (equal? s "")))
+                        (regexp-split #rx";" code-str)))
+  (cond
+    [(or (empty? codes) (member "0" codes)) #f]
+    [else
+     (or (for/first ([c (in-list codes)]
+                     #:when (hash-has-key? ansi-fg (string->number c)))
+           (hash-ref ansi-fg (string->number c)))
+         current)]))
+
+(define (ansi->html text)
+  (define out (open-output-string))
+  (define current #f)
+  (define (set-style! new)
+    (unless (equal? current new)
+      (when current (write-string "</span>" out))
+      (set! current new)
+      (when current (write-string (format "<span style=\"color:~a\">" current) out))))
+  (define len (string-length text))
+  (let loop ([pos 0])
+    (define m (regexp-match-positions #px"\x1b\\[([0-9;]*)m" text pos))
+    (if m
+        (let* ([whole (car m)] [codes (cadr m)])
+          (write-string (escape-text (substring text pos (car whole))) out)
+          (set-style! (sgr-result (substring text (car codes) (cdr codes)) current))
+          (loop (cdr whole)))
+        (begin
+          (write-string (escape-text (substring text pos len)) out)
+          (set-style! #f))))
+  (get-output-string out))
+
+;; 运行命令并捕获 stdout（UTF-8 解码），cwd 相对站点根
+;; 强制 FORCE_COLOR=1，让支持颜色输出的程序（如 termcolor）在管道下也输出 ANSI
+(define (run-terminal cmd cwd)
+  (define dir (if cwd (build-path (current-directory) cwd) (current-directory)))
+  (define saved-color (getenv "FORCE_COLOR"))
+  (putenv "FORCE_COLOR" "1")
+  (dynamic-wind
+    (lambda () (void))
+    (lambda ()
+      (parameterize ([current-directory dir])
+        (define handles (process cmd))
+        (define stdout (list-ref handles 0))
+        (define stdin (list-ref handles 1))
+        (define stderr (list-ref handles 3))
+        (close-output-port stdin)
+        (define text (bytes->string/utf-8 (port->bytes stdout)))
+        (close-input-port stdout)
+        (when stderr (port->string stderr))
+        text))
+    (lambda () (when saved-color (putenv "FORCE_COLOR" saved-color)))))
+
 ;; ---------- 块渲染（含 section 自动编号） ----------
 
 ;; prefix :: (listof integer)，表示当前章节号前缀
@@ -169,11 +308,24 @@
               (define lang (node-code-block-lang b))
               (define class (if lang (format " class=\"language-~a\"" (escape-attr lang)) ""))
               (format "<pre><code~a>~a</code></pre>\n" class
-                      (escape-text (node-code-block-code b)))]
+                      (escape-text (code-block-content b)))]
              [(node-display-math? b)
               (format "<p class=\"math-display\">\\[~a\\]</p>\n"
                       (escape-text (node-display-math-tex b)))]
              [(node-horizontal-line? b) "<hr>\n"]
+             [(node-table? b) (render-table b)]
+             [(node-enumerate? b)
+              (string-append
+               "<ol>\n"
+               (apply string-append
+                      (for/list ([item (in-list (node-enumerate-items b))])
+                        (format "  <li>~a</li>\n"
+                                (if (list? item) (render-inlines item) (render-inline item)))))
+               "</ol>\n")]
+             [(node-terminal-output? b)
+              (format "<pre class=\"terminal-output\">~a</pre>\n"
+                      (ansi->html (run-terminal (node-terminal-output-run b)
+                                                (node-terminal-output-cwd b))))]
              [(node-itemize? b)
               (string-append
                "<ul>\n"
@@ -184,19 +336,17 @@
                "</ul>\n")]
              [(node-image? b)
               (define img
-                (format "<img src=\"~a\" alt=\"~a\"~a~a~a>"
+                (format "<img src=\"~a\" alt=\"~a\"~a~a>"
                         (escape-attr (node-image-src b))
                         (escape-attr (node-image-alt b))
                         (if (node-image-title b)
                             (format " title=\"~a\"" (escape-attr (node-image-title b)))
                             "")
-                        (if (node-image-width b)
-                            (format " width=\"~a\"" (node-image-width b))
-                            "")
-                        (if (node-image-height b)
-                            (format " height=\"~a\"" (node-image-height b))
-                            "")))
-              (format "<p>~a</p>\n" img)]
+                        (image-size-style b)))
+              (if (node-image-caption b)
+                  (format "<figure>\n  ~a\n  <figcaption>~a</figcaption>\n</figure>\n"
+                          img (escape-text (node-image-caption b)))
+                  (format "<p>~a</p>\n" img))]
              [(node-posts-list? b) (render-posts-list (node-posts-list-count b))]
              [(node-page-links? b) (render-page-links)]
              [(inline-node? b) (format "<p>~a</p>\n" (render-inline b))]

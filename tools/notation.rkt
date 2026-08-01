@@ -14,6 +14,13 @@
  $$
  horizontal-line
  itemize
+ table
+ header-row
+ row
+ cell
+ cell-multi-line
+ enumerate
+ terminal-output
 
  ;; inline
  code-inline
@@ -42,6 +49,12 @@
  (struct-out node-display-math)
  (struct-out node-horizontal-line)
  (struct-out node-itemize)
+ (struct-out node-table)
+ (struct-out node-row)
+ (struct-out node-header-row)
+ (struct-out node-cell)
+ (struct-out node-enumerate)
+ (struct-out node-terminal-output)
  (struct-out node-code-inline)
  (struct-out node-italic)
  (struct-out node-bold)
@@ -61,10 +74,16 @@
 (struct node-section (title body) #:transparent)
 (struct node-paragraph (inlines) #:transparent)
 (struct node-quote-block (body) #:transparent)
-(struct node-code-block (lang code) #:transparent)
+(struct node-code-block (lang code from-file) #:transparent)
 (struct node-display-math (tex) #:transparent)
 (struct node-horizontal-line () #:transparent)
 (struct node-itemize (items) #:transparent)
+(struct node-table (align rows) #:transparent)
+(struct node-row (cells) #:transparent)
+(struct node-header-row (cells) #:transparent)
+(struct node-cell (lines) #:transparent)
+(struct node-enumerate (items) #:transparent)
+(struct node-terminal-output (run cwd) #:transparent)
 
 ;; inline
 (struct node-code-inline (code) #:transparent)
@@ -79,7 +98,7 @@
 (struct node-page-links () #:transparent)
 
 ;; 其他
-(struct node-image (src alt title width height) #:transparent)
+(struct node-image (src alt title width height caption) #:transparent)
 
 ;; ---------- 公开记号 ----------
 
@@ -98,10 +117,18 @@
 (define (paragraph . inlines) (node-paragraph inlines))
 (define (section title . body) (node-section title body))
 (define (quote-block . body) (node-quote-block body))
-(define (code-block #:lang [lang #f] code) (node-code-block lang code))
+(define (code-block #:lang [lang #f] #:from-file [from-file #f] [code #f])
+  (node-code-block lang code from-file))
 (define ($$ tex) (node-display-math tex))
 (define (horizontal-line) (node-horizontal-line))
 (define (itemize . items) (node-itemize items))
+(define (table #:align [align #f] . rows) (node-table align rows))
+(define (header-row . cells) (node-header-row cells))
+(define (row . cells) (node-row cells))
+(define (cell line) (node-cell (list line)))
+(define (cell-multi-line lines) (node-cell lines))
+(define (enumerate . items) (node-enumerate items))
+(define (terminal-output #:run run #:cwd [cwd #f]) (node-terminal-output run cwd))
 
 ;; inline
 (define (code-inline s) (node-code-inline s))
@@ -116,5 +143,7 @@
 (define (page-links) (node-page-links))
 
 ;; 其他
-(define (image src #:alt [alt #f] #:title [title #f] #:width [width #f] #:height [height #f])
-  (node-image src (or alt src) title width height))
+;; 图片尺寸 #:width/#:height：数字解释为 em（相对文字高度），字符串按 CSS 原样（如 "100%"）
+(define (image src #:alt [alt #f] #:title [title #f] #:width [width #f] #:height [height #f]
+                #:caption [caption #f])
+  (node-image src (or alt src) title width height caption))

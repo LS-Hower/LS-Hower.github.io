@@ -10,6 +10,13 @@
     #:title "觅我于字符之间"
     #:publish-date (day-date 2025 1 27))
    (paragraph
+    (bold "2026-08-01 更新：")
+    "题目链接已失效。可以看该题目的解答页面："
+    (hyperlink
+     "EncryptedDialog - 解谜末班车"
+     "https://solution.cpphusky.xyz/jia-chen/encrypted-dialog/"))
+   (horizontal-line)
+   (paragraph
     "大一上学期早已结束，现在是寒假。")
    (paragraph
     "学长 cppHusky 出了一套解谜题（"

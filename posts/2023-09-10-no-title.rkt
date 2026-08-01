@@ -9,6 +9,13 @@
    (metadata
     #:title "无题"
     #:publish-date (day-date 2023 9 10))
+   (paragraph
+    (bold "2026-08-01 更新：")
+    "文中的链接已失效。可以看这个链接："
+    (hyperlink
+     "歌词:叙聖のクオリア ～Subterranean rose～ - THBWiki · 专业性的东方Project维基百科 - TBSGroup"
+     "https://thwiki.cc/%E6%AD%8C%E8%AF%8D:%E5%8F%99%E8%81%96%E3%81%AE%E3%82%AF%E3%82%AA%E3%83%AA%E3%82%A2_%EF%BD%9ESubterranean_rose%EF%BD%9E"))
+   (horizontal-line)
    (section
     "一首东方二创曲的 PV"
     (paragraph

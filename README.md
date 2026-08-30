@@ -1,8 +1,8 @@
-# LS-Hower.github.io
+# LS_Hower 的个人网站
 
-LS Hower 的个人页面，通过 GitHub Pages 搭建。
-
-[页面链接](https://ls-hower.github.io/)
+页面链接：
+- [`ls-hower.cc`](https://ls-hower.cc/)
+- [`ls-hower.github.io`](https://ls-hower.github.io/)
 
 ## 构建
 

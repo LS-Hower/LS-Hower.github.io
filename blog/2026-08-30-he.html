@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>禾 - 小石</title>
+    <link href="../main.css" rel="stylesheet" id="css">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body, {delimiters:[{left:'\\(' , right:'\\)', display:false},{left:'\\[', right:'\\]', display:true}], throwOnError:false});"></script>
+  </head>
+
+  <body>
+    <header>
+      <h1>禾 - 小石</h1>
+      <a class="home-button" href="../index.html">回到首页</a>
+    </header>
+    <hr>
+
+    <main>
+<div class="page-meta">
+  发布日期：<time pubdate>2026-08-30</time>
+</div>
+
+<hr>
+
+<nav class="post-nav"><a class="next" href="../blog/2026-08-02-divmod.html">› 下一篇：带余除法策略</a></nav>
+
+<hr>
+
+<h2 id="sec-1">1 换框架</h2>
+<p>一个月前还是开始觉得手写 HTML 有点麻烦了，于是又想着用博客框架了，于是尝试了一下 <a href="https://hexo.io">Hexo</a>。选它是因为看到了一款观感不错的简约主题。但折腾了一天发现还是不尽如人意。</p>
+<p>于是我还是决定自己造一个博客生成框架。第一步是找一个表示方式，来将自己之前的那些博客和页面里的数据重写一下，可选的有 Markdown 和 HTML 甚至 JSON 等等。我这半年信仰 Scheme，于是选择了 S-表达式。我甚至感觉它会很通用。</p>
+<p>页面生成器是我让 AI 写的。我因为太懒所以甚至刚好完全落实了“代码一眼不看”的所谓“Vibe Coding 的宗旨”。不知道现在代码是怎么样一个情况。其实一直有一种“不是自己的东西”的感觉。至少之后必须把代码重构几次。此外当然它的功能还很少，还很可能有大量缺陷。至少现在就有一些功能我想加上，比如博客类别和标签系统。</p>
+<p>现在这个网站更好看了一些，还是挺不错的。</p>
+<h2 id="sec-2">2 带余除法策略</h2>
+<p>正是因为这篇文章里大量使用\(\LaTeX\)，还使用了列表、表格代码块，我才有动力真的不再手写 HTML 而是用框架了。这算是直接原因。</p>
+<p>页面生成器还应当拥有将我的页面转换成其他表示（比如 Markdown）的能力。也就是说，要有 Markdown 渲染器。这样我就可以在其他平台同步上传文章了。</p>
+<p>哦对了，发布完后不久发现里面的基于无条件控制余数符号的策略似乎还是有机会优雅自然地扩展到复数域的，之后还得改。</p>
+<p>这篇文章也是我这个博客里第一篇讲知识的文章，在此之前，这里的博客都只是网络日记。画风有点不太对。这也是为什么应该尽快做一个文章类别系统。</p>
+<h2 id="sec-3">3 新域名</h2>
+<p>买了一个域名 <a href="https://ls-hower.cc"><code>ls-hower.cc</code></a>，现在用在本站了。</p>
+    </main>
+  </body>
+</html>

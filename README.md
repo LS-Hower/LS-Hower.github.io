@@ -6,24 +6,36 @@ LS Hower 的个人页面，通过 GitHub Pages 搭建。
 
 ## 构建
 
-需要安装 [Racket](https://racket-lang.org/) 。文章页与站点页使用基于 Racket 的表记方法（见 `tools/notation.rkt`）写成。它们的源代码也是合法的 Racket 源代码。
+### 环境要求
 
-- `posts/*.rkt` ：文章页源代码
-- `pages/*.rkt` ：站点页源代码（含 `index.rkt` ）
-- `assets/` ：图片、代码等资源
+- [Racket](https://racket-lang.org/) 。
+- 部分文章所需要的 Python 环境和一些三方库。具体地，只有 `2026-08-02-divmod` 这一篇文章。将来会移除这一要求。
 
-在仓库根目录运行：
+### 命令
 
-```
+仓库根目录：
+
+```bash
 racket tools/build.rkt
 ```
 
-生成
+### 文件
 
-- `index.html` ：主页
-- `blog/*.html` ：文章页
-- `site/*.html` ：站点页
+页面：
 
-构建前会清理这些位置中本次未生成的遗留 `.html` 。
+- 文章页： `posts/*.rkt` 编译至 `blog/*.html` 。
+    - 特别地，示例代码 `posts/example.rkt` 不编译。
+- 站点页： `pages/*.rkt` 编译至 `site/*.html` 。
+    - 特别地，首页： `pages/index.rkt` 编译至 `index.html` 。
 
-部分文章用 `terminal-output` 在构建时运行 Python 脚本（如 `(terminal-output #:run "python divmod_plots.py" #:cwd "assets")`）并把彩色输出渲染进页面，因此这些文章的构建依赖对应的 Python 环境。
+（构建前会先清理。）
+
+其他：
+
+- 图片、代码等资源： `assets/`
+- 图标： `favicon.ico`
+- 样式： `main.css`
+
+### 说明
+
+文章页与站点页使用一种基于 Racket 的表记方法写成，它们的源代码也是合法的 Racket 源代码。至于用法，没有文档，源代码先凑合着看吧： `tools/notation.rkt` 。

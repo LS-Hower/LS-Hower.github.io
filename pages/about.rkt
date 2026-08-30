@@ -14,4 +14,9 @@
    (paragraph
     (hyperlink
      "本站 GitHub 仓库"
-     "https://github.com/LS-Hower/LS-Hower.github.io"))))
+     "https://github.com/LS-Hower/LS-Hower.github.io"))
+   (paragraph
+    "本站的域名：")
+   (itemize
+    (hyperlink (code-inline "ls-hower.github.io") "https://ls-hower.github.io")
+    (hyperlink (code-inline "ls-hower.cc") "https://ls-hower.cc"))))

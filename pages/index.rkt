@@ -14,14 +14,9 @@
           #:title "常用头像“绀”"
           #:width 18.75
           #:height 18.75)
-   (paragraph
-     "欢迎。")
-   (paragraph
-    "这是 LS_Hower 的网站。")
-   (paragraph
-    (hyperlink
-     "LS-Hower 的 GitHub 个人资料"
-     "https://github.com/LS-Hower"))
+   (paragraph "欢迎。")
+   (paragraph "这是 LS_Hower 的网站。")
+   (paragraph (hyperlink "LS-Hower 的 GitHub 个人资料" "https://github.com/LS-Hower"))
    (section
     "最新文章"
     (posts-list))

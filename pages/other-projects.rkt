@@ -7,7 +7,7 @@
 (define page
   (document
     (metadata
-      #:title "其他项目"
+      #:title "我的其他项目"
       #:numbered #t)
     (section "编程语言 Scheme"
       (section "SICP 解题集"

@@ -408,13 +408,13 @@
    (if home?
        (format "      <a class=\"home-button\" href=\"~a\">回到首页</a>\n" (escape-attr index-url))
        "")
+   ;; 文章页：上一篇/下一篇、元信息都在标题下方、水平线之上；站点页两者为空
+   (prev-next-nav)
+   (meta-block meta)
    "    </header>\n"
    "    <hr>\n\n"
    "    <main>\n"
-   ;; 元信息、上一篇/下一篇、正文三段，用 <hr> 分隔，空段跳过
-   (string-join (filter (lambda (s) (not (equal? s "")))
-                        (list (meta-block meta) (prev-next-nav) body-html))
-                "\n<hr>\n\n")
+   body-html
    "    </main>\n"
    "  </body>\n"
    "</html>\n"))

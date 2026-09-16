@@ -18,7 +18,7 @@
 racket tools/build.rkt
 ```
 
-### 文件
+### 数据流向
 
 页面：
 
@@ -38,3 +38,39 @@ racket tools/build.rkt
 ### 说明
 
 文章页与站点页使用一种基于 Racket 的表记方法写成，它们的源代码也是合法的 Racket 源代码。至于用法，没有文档，源代码先凑合着看吧： `tools/notation.rkt` 。
+
+## 部署
+
+### 环境要求
+
+- [Racket](https://racket-lang.org/) 。
+
+### 命令
+
+仓库根目录：
+
+```bash
+racket tools/deploy.rkt
+```
+
+### 数据流向
+
+部署命令会构建站点，并把发布内容以单个提交强推到 `origin` 的 `gh-pages` 分支。发布内容如下：
+
+- `index.html`
+- `blog/`
+- `site/`
+- `main.css`
+- `favicon.ico`
+- `CNAME`
+- `assets/`
+
+源码位于 `main` 分支，构建产物位于 `gh-pages` 分支。在 `main` 分支中，主要的构建产物都写入 `.gitignore` 了：
+
+- `index.html`
+- `blog/`
+- `site/`
+
+### 说明
+
+网站基于 GitHub Pages 部署。

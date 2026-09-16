@@ -11,3 +11,9 @@ compiled/
 # VS Code
 
 .vscode/
+
+# 构建产物（发布在 gh-pages 分支）
+
+/index.html
+/blog/
+/site/

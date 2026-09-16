@@ -11,7 +11,7 @@
     #:numbered #f)
    (section
     "博客"
-    (itemize
+    (list-unordered
      (hyperlink "nanakotoki" "https://nanakotoki.github.io/")
      (hyperlink "Topology2333" "https://topology2333.github.io/blog/")
      (hyperlink "Auceptin" "https://aucept.in/")

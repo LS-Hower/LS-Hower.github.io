@@ -252,19 +252,19 @@
                       (escape-text (node-display-math-tex b)))]
              [(node-horizontal-line? b) "<hr>\n"]
              [(node-table? b) (render-table b)]
-             [(node-enumerate? b)
+             [(node-list-ordered? b)
               (string-append
                "<ol>\n"
                (apply string-append
-                      (for/list ([item (in-list (node-enumerate-items b))])
+                      (for/list ([item (in-list (node-list-ordered-items b))])
                         (format "  <li>~a</li>\n"
                                 (if (list? item) (render-inlines item) (render-inline item)))))
                "</ol>\n")]
-             [(node-itemize? b)
+             [(node-list-unordered? b)
               (string-append
                "<ul>\n"
                (apply string-append
-                      (for/list ([item (in-list (node-itemize-items b))])
+                      (for/list ([item (in-list (node-list-unordered-items b))])
                         (format "  <li>~a</li>\n"
                                 (if (list? item) (render-inlines item) (render-inline item)))))
                "</ul>\n")]
@@ -324,7 +324,7 @@
     [(node-section? x) (contains-math? (node-section-body x))]
     [(node-paragraph? x) (contains-math? (node-paragraph-inlines x))]
     [(node-quote-block? x) (contains-math? (node-quote-block-body x))]
-    [(node-itemize? x) (contains-math? (node-itemize-items x))]
+    [(node-list-unordered? x) (contains-math? (node-list-unordered-items x))]
     [(node-bold? x) (contains-math? (node-bold-inlines x))]
     [(node-italic? x) (contains-math? (node-italic-inlines x))]
     [(node-strike? x) (contains-math? (node-strike-inlines x))]

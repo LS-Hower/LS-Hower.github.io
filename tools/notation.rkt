@@ -13,13 +13,13 @@
  code-block
  $$
  horizontal-line
- itemize
+ list-unordered
  table
  header-row
  row
  cell
  cell-multi-line
- enumerate
+ list-ordered
 
  ;; inline
  code-inline
@@ -47,12 +47,12 @@
  (struct-out node-code-block)
  (struct-out node-display-math)
  (struct-out node-horizontal-line)
- (struct-out node-itemize)
+ (struct-out node-list-unordered)
  (struct-out node-table)
  (struct-out node-row)
  (struct-out node-header-row)
  (struct-out node-cell)
- (struct-out node-enumerate)
+ (struct-out node-list-ordered)
  (struct-out node-code-inline)
  (struct-out node-italic)
  (struct-out node-bold)
@@ -75,12 +75,12 @@
 (struct node-code-block (lang code from-file) #:transparent)
 (struct node-display-math (tex) #:transparent)
 (struct node-horizontal-line () #:transparent)
-(struct node-itemize (items) #:transparent)
+(struct node-list-unordered (items) #:transparent)
 (struct node-table (align rows) #:transparent)
 (struct node-row (cells) #:transparent)
 (struct node-header-row (cells) #:transparent)
 (struct node-cell (lines) #:transparent)
-(struct node-enumerate (items) #:transparent)
+(struct node-list-ordered (items) #:transparent)
 
 ;; inline
 (struct node-code-inline (code) #:transparent)
@@ -118,13 +118,13 @@
   (node-code-block lang code from-file))
 (define ($$ tex) (node-display-math tex))
 (define (horizontal-line) (node-horizontal-line))
-(define (itemize . items) (node-itemize items))
+(define (list-unordered . items) (node-list-unordered items))
 (define (table #:align [align #f] . rows) (node-table align rows))
 (define (header-row . cells) (node-header-row cells))
 (define (row . cells) (node-row cells))
 (define (cell line) (node-cell (list line)))
 (define (cell-multi-line lines) (node-cell lines))
-(define (enumerate . items) (node-enumerate items))
+(define (list-ordered . items) (node-list-ordered items))
 
 ;; inline
 (define (code-inline s) (node-code-inline s))

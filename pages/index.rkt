@@ -24,7 +24,7 @@
     (page-links))
    (section
     "联系方式"
-    (itemize
+    (list-unordered
      (list "GitHub 账号：" (hyperlink "LS-Hower" "https://github.com/LS-Hower"))
      (list "QQ 号：" (code-inline "37812535"))
      (list "邮箱：" (hyperlink (code-inline "ls.hower06@gmail.com") "mailto:ls.hower06@gmail.com"))

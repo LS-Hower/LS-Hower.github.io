@@ -17,6 +17,6 @@
      "https://github.com/LS-Hower/LS-Hower.github.io"))
    (paragraph
     "本站的域名：")
-   (itemize
+   (list-unordered
     (hyperlink (code-inline "ls-hower.cc") "https://ls-hower.cc")
     (hyperlink (code-inline "ls-hower.github.io") "https://ls-hower.github.io"))))

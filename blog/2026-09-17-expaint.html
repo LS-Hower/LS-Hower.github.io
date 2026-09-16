@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>梦境 | 五个字符的 expaint - 小石</title>
+    <link href="../main.css" rel="stylesheet" id="css">
+    <link rel="shortcut icon" href="../favicon.ico">
+  </head>
+
+  <body>
+    <header>
+      <h1>梦境 | 五个字符的 expaint - 小石</h1>
+      <a class="home-button" href="../index.html">回到首页</a>
+    </header>
+    <hr>
+
+    <main>
+<div class="page-meta">
+  发布日期：<time pubdate>2026-09-17</time>
+</div>
+
+<hr>
+
+<nav class="post-nav"><a class="next" href="../blog/2026-09-03-whitespace.html">› 下一篇：原来 Whitespace 语言甚至能用</a></nav>
+
+<hr>
+
+<p>阙。</p>
+<p>是的，指针当然表现得像有符号数一样。</p>
+<p>于是我试着点开 jajuju 发的代码中，长度只有五个字符的 <code>expaint</code> 函数名，去一探 <code>offsetof</code> 的究竟。</p>
+<p>但它是红色的，点不开。</p>
+<h2 id="sec-1">1 醒了过来</h2>
+<p>打开 <code>cppreference</code> 试着查找……等等，不用找了。<code>offsetof</code> 返回的是偏移量不是差，返回类型肯定是 <code>size_t</code> 而不是什么 <code>offset_t</code>。有符号的东西是 <code>ptrdiff_t</code>。</p>
+    </main>
+  </body>
+</html>

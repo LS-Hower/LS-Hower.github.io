@@ -20,7 +20,6 @@
  cell
  cell-multi-line
  enumerate
- terminal-output
 
  ;; inline
  code-inline
@@ -54,7 +53,6 @@
  (struct-out node-header-row)
  (struct-out node-cell)
  (struct-out node-enumerate)
- (struct-out node-terminal-output)
  (struct-out node-code-inline)
  (struct-out node-italic)
  (struct-out node-bold)
@@ -83,7 +81,6 @@
 (struct node-header-row (cells) #:transparent)
 (struct node-cell (lines) #:transparent)
 (struct node-enumerate (items) #:transparent)
-(struct node-terminal-output (run cwd) #:transparent)
 
 ;; inline
 (struct node-code-inline (code) #:transparent)
@@ -128,7 +125,6 @@
 (define (cell line) (node-cell (list line)))
 (define (cell-multi-line lines) (node-cell lines))
 (define (enumerate . items) (node-enumerate items))
-(define (terminal-output #:run run #:cwd [cwd #f]) (node-terminal-output run cwd))
 
 ;; inline
 (define (code-inline s) (node-code-inline s))

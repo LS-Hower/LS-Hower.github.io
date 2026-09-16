@@ -265,7 +265,7 @@
     "行为的等价类"
     (paragraph
      "许多除法在不同情况下行为是可能相同的，我们可以划分等价类。")
-    (terminal-output #:run "python -X utf8 divmod_plots.py" #:cwd "assets")
+    (code-block #:lang "text" #:from-file "assets/divmod_plots_output.txt")
     (paragraph "生成代码见文末。"))
    (section
     "在一些编程语言中的情况"

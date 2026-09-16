@@ -433,107 +433,107 @@
 <p>这个表格主要评测的是余数的性质好不好，所以对约半成偶和约半成奇有些不公平。而在实际中，这两种修约方式，以及对应的带余除法，其实是相当推荐的。<a href="https://standards.ieee.org/ieee/754/6210/">IEEE 754</a> 标准中要求实现提供的“remainder”操作更是要求无视其他设置，总是使用约半成偶的除法。</p>
 <h2 id="sec-7">7 行为的等价类</h2>
 <p>许多除法在不同情况下行为是可能相同的，我们可以划分等价类。</p>
-<pre class="terminal-output">-------- a(-+) n(-+) --------
-  0. <span style="color:#949800">余数非正   </span> 余数非正_n  向上取整_n 
-  1. <span style="color:#949800">余数非负   </span> 余数非负_n  向下取整_n 
-  2. <span style="color:#949800">向上取整   </span>
-  3. <span style="color:#949800">向下取整   </span>
-  4. <span style="color:#949800">离零进位   </span> 余数非正_z  余数非正_zn 向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
-  5. <span style="color:#949800">约半右闭   </span> 约半右闭_n  约半向下_n 
-  6. <span style="color:#949800">约半向上   </span>
-  7. <span style="color:#949800">约半向下   </span>
-  8. <span style="color:#949800">约半左闭   </span> 约半向上_n  约半左闭_n 
-  9. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
- 10. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
- 11. <span style="color:#949800">约半离零   </span> 约半向上_zn 约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
- 12. <span style="color:#949800">约半趋零   </span> 约半右闭_z  约半右闭_zn 约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
- 13. <span style="color:#949800">趋零截断   </span> 余数非负_z  余数非负_zn 向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
- 14. 向上取整_z 
- 15. 向下取整_z 
- 16. 约半向上_z 
- 17. 约半向下_z 
+<pre><code class="language-text">-------- a(-+) n(-+) --------
+  0. 余数非正    余数非正_n  向上取整_n
+  1. 余数非负    余数非负_n  向下取整_n
+  2. 向上取整
+  3. 向下取整
+  4. 离零进位    余数非正_z  余数非正_zn 向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
+  5. 约半右闭    约半右闭_n  约半向下_n
+  6. 约半向上
+  7. 约半向下
+  8. 约半左闭    约半向上_n  约半左闭_n
+  9. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+ 10. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
+ 11. 约半离零    约半向上_zn 约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+ 12. 约半趋零    约半右闭_z  约半右闭_zn 约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
+ 13. 趋零截断    余数非负_z  余数非负_zn 向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+ 14. 向上取整_z
+ 15. 向下取整_z
+ 16. 约半向上_z
+ 17. 约半向下_z
 共 18 个等价类
 -------- a(-+) n(-) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">向下取整   </span> 余数非正_n  向上取整_n 
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">向上取整   </span> 余数非负_n  向下取整_n 
-  2. <span style="color:#949800">离零进位   </span> 余数非正_z  余数非正_zn 向上取整_zn 向下取整_z  离零进位_n  离零进位_z  离零进位_zn
-  3. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半向上   </span> 约半右闭_n  约半向下_n 
-  4. <span style="color:#949800">约半向下   </span> <span style="color:#949800">约半左闭   </span> 约半向上_n  约半左闭_n 
-  5. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  6. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
-  7. <span style="color:#949800">约半离零   </span> 约半向上_zn 约半向下_z  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  8. <span style="color:#949800">约半趋零   </span> 约半右闭_z  约半右闭_zn 约半向上_z  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
-  9. <span style="color:#949800">趋零截断   </span> 余数非负_z  余数非负_zn 向上取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  0. 余数非正    向下取整    余数非正_n  向上取整_n
+  1. 余数非负    向上取整    余数非负_n  向下取整_n
+  2. 离零进位    余数非正_z  余数非正_zn 向上取整_zn 向下取整_z  离零进位_n  离零进位_z  离零进位_zn
+  3. 约半右闭    约半向上    约半右闭_n  约半向下_n
+  4. 约半向下    约半左闭    约半向上_n  约半左闭_n
+  5. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  6. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
+  7. 约半离零    约半向上_zn 约半向下_z  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  8. 约半趋零    约半右闭_z  约半右闭_zn 约半向上_z  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
+  9. 趋零截断    余数非负_z  余数非负_zn 向上取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
 共 10 个等价类
 -------- a(-+) n(+) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">向上取整   </span> 余数非正_n  向上取整_n 
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">向下取整   </span> 余数非负_n  向下取整_n 
-  2. <span style="color:#949800">离零进位   </span> 余数非正_z  余数非正_zn 向上取整_z  向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
-  3. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半向下   </span> 约半右闭_n  约半向下_n 
-  4. <span style="color:#949800">约半向上   </span> <span style="color:#949800">约半左闭   </span> 约半向上_n  约半左闭_n 
-  5. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  6. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
-  7. <span style="color:#949800">约半离零   </span> 约半向上_z  约半向上_zn 约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  8. <span style="color:#949800">约半趋零   </span> 约半右闭_z  约半右闭_zn 约半向下_z  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
-  9. <span style="color:#949800">趋零截断   </span> 余数非负_z  余数非负_zn 向下取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  0. 余数非正    向上取整    余数非正_n  向上取整_n
+  1. 余数非负    向下取整    余数非负_n  向下取整_n
+  2. 离零进位    余数非正_z  余数非正_zn 向上取整_z  向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
+  3. 约半右闭    约半向下    约半右闭_n  约半向下_n
+  4. 约半向上    约半左闭    约半向上_n  约半左闭_n
+  5. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  6. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
+  7. 约半离零    约半向上_z  约半向上_zn 约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  8. 约半趋零    约半右闭_z  约半右闭_zn 约半向下_z  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
+  9. 趋零截断    余数非负_z  余数非负_zn 向下取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
 共 10 个等价类
 -------- a(-) n(-+) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">趋零截断   </span> 余数非正_n  余数非负_z  余数非负_zn 向上取整_n  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">离零进位   </span> 余数非正_z  余数非正_zn 余数非负_n  向上取整_zn 向下取整_n  离零进位_n  离零进位_z  离零进位_zn
-  2. <span style="color:#949800">向上取整   </span> 向下取整_z 
-  3. <span style="color:#949800">向下取整   </span> 向上取整_z 
-  4. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半离零   </span> 约半右闭_n  约半向上_zn 约半向下_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  5. <span style="color:#949800">约半向上   </span> 约半向下_z 
-  6. <span style="color:#949800">约半向下   </span> 约半向上_z 
-  7. <span style="color:#949800">约半左闭   </span> <span style="color:#949800">约半趋零   </span> 约半右闭_z  约半右闭_zn 约半向上_n  约半向下_zn 约半左闭_n  约半趋零_n  约半趋零_z  约半趋零_zn
-  8. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  9. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
+  0. 余数非正    趋零截断    余数非正_n  余数非负_z  余数非负_zn 向上取整_n  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  1. 余数非负    离零进位    余数非正_z  余数非正_zn 余数非负_n  向上取整_zn 向下取整_n  离零进位_n  离零进位_z  离零进位_zn
+  2. 向上取整    向下取整_z
+  3. 向下取整    向上取整_z
+  4. 约半右闭    约半离零    约半右闭_n  约半向上_zn 约半向下_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  5. 约半向上    约半向下_z
+  6. 约半向下    约半向上_z
+  7. 约半左闭    约半趋零    约半右闭_z  约半右闭_zn 约半向上_n  约半向下_zn 约半左闭_n  约半趋零_n  约半趋零_z  约半趋零_zn
+  8. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  9. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
 共 10 个等价类
 -------- a(-) n(-) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">向下取整   </span> <span style="color:#949800">趋零截断   </span> 余数非正_n  余数非负_z  余数非负_zn 向上取整_n  向上取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">向上取整   </span> <span style="color:#949800">离零进位   </span> 余数非正_z  余数非正_zn 余数非负_n  向上取整_zn 向下取整_n  向下取整_z  离零进位_n  离零进位_z  离零进位_zn
-  2. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半向上   </span> <span style="color:#949800">约半离零   </span> 约半右闭_n  约半向上_zn 约半向下_n  约半向下_z  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  3. <span style="color:#949800">约半向下   </span> <span style="color:#949800">约半左闭   </span> <span style="color:#949800">约半趋零   </span> 约半右闭_z  约半右闭_zn 约半向上_n  约半向上_z  约半向下_zn 约半左闭_n  约半趋零_n  约半趋零_z  约半趋零_zn
-  4. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  5. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
+  0. 余数非正    向下取整    趋零截断    余数非正_n  余数非负_z  余数非负_zn 向上取整_n  向上取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  1. 余数非负    向上取整    离零进位    余数非正_z  余数非正_zn 余数非负_n  向上取整_zn 向下取整_n  向下取整_z  离零进位_n  离零进位_z  离零进位_zn
+  2. 约半右闭    约半向上    约半离零    约半右闭_n  约半向上_zn 约半向下_n  约半向下_z  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  3. 约半向下    约半左闭    约半趋零    约半右闭_z  约半右闭_zn 约半向上_n  约半向上_z  约半向下_zn 约半左闭_n  约半趋零_n  约半趋零_z  约半趋零_zn
+  4. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  5. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
 共 6 个等价类
 -------- a(-) n(+) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">向上取整   </span> <span style="color:#949800">趋零截断   </span> 余数非正_n  余数非负_z  余数非负_zn 向上取整_n  向下取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">向下取整   </span> <span style="color:#949800">离零进位   </span> 余数非正_z  余数非正_zn 余数非负_n  向上取整_z  向上取整_zn 向下取整_n  离零进位_n  离零进位_z  离零进位_zn
-  2. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半向下   </span> <span style="color:#949800">约半离零   </span> 约半右闭_n  约半向上_z  约半向上_zn 约半向下_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  3. <span style="color:#949800">约半向上   </span> <span style="color:#949800">约半左闭   </span> <span style="color:#949800">约半趋零   </span> 约半右闭_z  约半右闭_zn 约半向上_n  约半向下_z  约半向下_zn 约半左闭_n  约半趋零_n  约半趋零_z  约半趋零_zn
-  4. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  5. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
+  0. 余数非正    向上取整    趋零截断    余数非正_n  余数非负_z  余数非负_zn 向上取整_n  向下取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  1. 余数非负    向下取整    离零进位    余数非正_z  余数非正_zn 余数非负_n  向上取整_z  向上取整_zn 向下取整_n  离零进位_n  离零进位_z  离零进位_zn
+  2. 约半右闭    约半向下    约半离零    约半右闭_n  约半向上_z  约半向上_zn 约半向下_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  3. 约半向上    约半左闭    约半趋零    约半右闭_z  约半右闭_zn 约半向上_n  约半向下_z  约半向下_zn 约半左闭_n  约半趋零_n  约半趋零_z  约半趋零_zn
+  4. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  5. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
 共 6 个等价类
 -------- a(+) n(-+) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">离零进位   </span> 余数非正_n  余数非正_z  余数非正_zn 向上取整_n  向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">趋零截断   </span> 余数非负_n  余数非负_z  余数非负_zn 向下取整_n  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
-  2. <span style="color:#949800">向上取整   </span> 向上取整_z 
-  3. <span style="color:#949800">向下取整   </span> 向下取整_z 
-  4. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半趋零   </span> 约半右闭_n  约半右闭_z  约半右闭_zn 约半向下_n  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
-  5. <span style="color:#949800">约半向上   </span> 约半向上_z 
-  6. <span style="color:#949800">约半向下   </span> 约半向下_z 
-  7. <span style="color:#949800">约半左闭   </span> <span style="color:#949800">约半离零   </span> 约半向上_n  约半向上_zn 约半左闭_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  8. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  9. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
+  0. 余数非正    离零进位    余数非正_n  余数非正_z  余数非正_zn 向上取整_n  向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
+  1. 余数非负    趋零截断    余数非负_n  余数非负_z  余数非负_zn 向下取整_n  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  2. 向上取整    向上取整_z
+  3. 向下取整    向下取整_z
+  4. 约半右闭    约半趋零    约半右闭_n  约半右闭_z  约半右闭_zn 约半向下_n  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
+  5. 约半向上    约半向上_z
+  6. 约半向下    约半向下_z
+  7. 约半左闭    约半离零    约半向上_n  约半向上_zn 约半左闭_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  8. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  9. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
 共 10 个等价类
 -------- a(+) n(-) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">向下取整   </span> <span style="color:#949800">离零进位   </span> 余数非正_n  余数非正_z  余数非正_zn 向上取整_n  向上取整_zn 向下取整_z  离零进位_n  离零进位_z  离零进位_zn
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">向上取整   </span> <span style="color:#949800">趋零截断   </span> 余数非负_n  余数非负_z  余数非负_zn 向上取整_z  向下取整_n  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
-  2. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半向上   </span> <span style="color:#949800">约半趋零   </span> 约半右闭_n  约半右闭_z  约半右闭_zn 约半向上_z  约半向下_n  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
-  3. <span style="color:#949800">约半向下   </span> <span style="color:#949800">约半左闭   </span> <span style="color:#949800">约半离零   </span> 约半向上_n  约半向上_zn 约半向下_z  约半左闭_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  4. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  5. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
+  0. 余数非正    向下取整    离零进位    余数非正_n  余数非正_z  余数非正_zn 向上取整_n  向上取整_zn 向下取整_z  离零进位_n  离零进位_z  离零进位_zn
+  1. 余数非负    向上取整    趋零截断    余数非负_n  余数非负_z  余数非负_zn 向上取整_z  向下取整_n  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  2. 约半右闭    约半向上    约半趋零    约半右闭_n  约半右闭_z  约半右闭_zn 约半向上_z  约半向下_n  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
+  3. 约半向下    约半左闭    约半离零    约半向上_n  约半向上_zn 约半向下_z  约半左闭_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  4. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  5. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
 共 6 个等价类
 -------- a(+) n(+) --------
-  0. <span style="color:#949800">余数非正   </span> <span style="color:#949800">向上取整   </span> <span style="color:#949800">离零进位   </span> 余数非正_n  余数非正_z  余数非正_zn 向上取整_n  向上取整_z  向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
-  1. <span style="color:#949800">余数非负   </span> <span style="color:#949800">向下取整   </span> <span style="color:#949800">趋零截断   </span> 余数非负_n  余数非负_z  余数非负_zn 向下取整_n  向下取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
-  2. <span style="color:#949800">约半右闭   </span> <span style="color:#949800">约半向下   </span> <span style="color:#949800">约半趋零   </span> 约半右闭_n  约半右闭_z  约半右闭_zn 约半向下_n  约半向下_z  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
-  3. <span style="color:#949800">约半向上   </span> <span style="color:#949800">约半左闭   </span> <span style="color:#949800">约半离零   </span> 约半向上_n  约半向上_z  约半向上_zn 约半左闭_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
-  4. <span style="color:#949800">约半成偶   </span> 约半成偶_n  约半成偶_z  约半成偶_zn
-  5. <span style="color:#949800">约半成奇   </span> 约半成奇_n  约半成奇_z  约半成奇_zn
+  0. 余数非正    向上取整    离零进位    余数非正_n  余数非正_z  余数非正_zn 向上取整_n  向上取整_z  向上取整_zn 离零进位_n  离零进位_z  离零进位_zn
+  1. 余数非负    向下取整    趋零截断    余数非负_n  余数非负_z  余数非负_zn 向下取整_n  向下取整_z  向下取整_zn 趋零截断_n  趋零截断_z  趋零截断_zn
+  2. 约半右闭    约半向下    约半趋零    约半右闭_n  约半右闭_z  约半右闭_zn 约半向下_n  约半向下_z  约半向下_zn 约半趋零_n  约半趋零_z  约半趋零_zn
+  3. 约半向上    约半左闭    约半离零    约半向上_n  约半向上_z  约半向上_zn 约半左闭_n  约半左闭_z  约半左闭_zn 约半离零_n  约半离零_z  约半离零_zn
+  4. 约半成偶    约半成偶_n  约半成偶_z  约半成偶_zn
+  5. 约半成奇    约半成奇_n  约半成奇_z  约半成奇_zn
 共 6 个等价类
-</pre>
+</code></pre>
 <p>生成代码见文末。</p>
 <h2 id="sec-8">8 在一些编程语言中的情况</h2>
 <p><strong>TODO: 排版目前有问题。表格暂时先不显示。</strong></p>

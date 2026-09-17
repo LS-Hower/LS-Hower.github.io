@@ -288,6 +288,19 @@
 
 ;; ---------- 前后篇导航 ----------
 
+;; 无相邻文章时也占一行（“无”），以免顶部高度变化
+(define (prev-link p)
+  (if p
+      (format "<a class=\"prev\" href=\"~a\">‹ 更晚的一篇：~a</a>"
+              (post-url p) (escape-text (post-rec-title p)))
+      "<span class=\"prev\">‹ 更晚的一篇：无</span>"))
+
+(define (next-link p)
+  (if p
+      (format "<a class=\"next\" href=\"~a\">› 更早的一篇：~a</a>"
+              (post-url p) (escape-text (post-rec-title p)))
+      "<span class=\"next\">› 更早的一篇：无</span>"))
+
 (define (prev-next-nav)
   (define posts (current-posts))
   (define name (current-output-name))
@@ -297,19 +310,11 @@
         (if idx
             (let ([newer (and (> idx 0) (list-ref posts (sub1 idx)))]
                   [older (and (< idx (sub1 (length posts))) (list-ref posts (add1 idx)))])
-              (if (or newer older)
-                  (string-append
-                   "<nav class=\"post-nav\">"
-                   (if newer
-                       (format "<a class=\"prev\" href=\"~a\">‹ 上一篇：~a</a>"
-                               (post-url newer) (escape-text (post-rec-title newer)))
-                       "")
-                   (if older
-                       (format "<a class=\"next\" href=\"~a\">› 下一篇：~a</a>"
-                               (post-url older) (escape-text (post-rec-title older)))
-                       "")
-                   "</nav>\n")
-                  ""))
+              (string-append
+               "<nav class=\"post-nav\">"
+               (prev-link newer)
+               (next-link older)
+               "</nav>\n"))
             ""))))
 
 ;; ---------- 数学 ----------
@@ -408,7 +413,7 @@
    (if home?
        (format "      <a class=\"home-button\" href=\"~a\">回到首页</a>\n" (escape-attr index-url))
        "")
-   ;; 文章页：上一篇/下一篇、元信息都在标题下方、水平线之上；站点页两者为空
+   ;; 文章页：更晚/更早的一篇、元信息都在标题下方、水平线之上；站点页两者为空
    (prev-next-nav)
    (meta-block meta)
    "    </header>\n"

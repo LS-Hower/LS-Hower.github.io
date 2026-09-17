@@ -1,8 +1,8 @@
 # LS_Hower 的个人网站
 
 页面链接：
-- [`ls-hower.cc`](https://ls-hower.cc/)
-- [`ls-hower.github.io`](https://ls-hower.github.io/)
+
+- [`call-cc.cc`](https://call-cc.cc/)
 
 ## 构建
 

@@ -18,5 +18,7 @@
    (paragraph
     "本站的域名：")
    (list-unordered
+    (hyperlink (code-inline "call-cc.cc") "https://call-cc.cc")
+    (hyperlink (code-inline "call-cc.ink") "https://call-cc.ink")
     (hyperlink (code-inline "ls-hower.cc") "https://ls-hower.cc")
     (hyperlink (code-inline "ls-hower.github.io") "https://ls-hower.github.io"))))

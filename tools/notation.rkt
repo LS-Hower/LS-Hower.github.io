@@ -1,5 +1,7 @@
 #lang racket
 
+(require racket/list)
+
 (provide
  ;; 文档级
  document
@@ -97,6 +99,28 @@
 ;; 其他
 (struct node-image (src alt title width height caption) #:transparent)
 
+;; ---------- 内联序列 ----------
+
+;; 约定：AST 中所有“内联位置”一律存放内联序列，即 (listof 内联)，
+;; 内联 = 字符串 | 内联节点。构造函数接受“内联”或其列表，嵌套列表会摊平，
+;; 这样渲染层不必再猜某个字段是单个内联还是一串内联。
+
+(define (inline? v)
+  (or (string? v)
+      (node-code-inline? v)
+      (node-italic? v)
+      (node-bold? v)
+      (node-strike? v)
+      (node-inline-math? v)
+      (node-hyperlink? v)))
+
+(define (->inlines v)
+  (cond
+    [(null? v) '()]
+    [(pair? v) (append* (map ->inlines v))]
+    [(inline? v) (list v)]
+    [else (error 'notation "期望内联或内联列表，得到 ~e" v)]))
+
 ;; ---------- 公开记号 ----------
 
 (define (document meta . body) (node-document meta body))
@@ -111,28 +135,28 @@
 (define (day-date year month day) (node-date year month day))
 
 ;; block
-(define (paragraph . inlines) (node-paragraph inlines))
+(define (paragraph . inlines) (node-paragraph (->inlines inlines)))
 (define (section title . body) (node-section title body))
 (define (quote-block . body) (node-quote-block body))
 (define (code-block #:lang [lang #f] #:from-file [from-file #f] [code #f])
   (node-code-block lang code from-file))
 (define ($$ tex) (node-display-math tex))
 (define (horizontal-line) (node-horizontal-line))
-(define (list-unordered . items) (node-list-unordered items))
+(define (list-unordered . items) (node-list-unordered (map ->inlines items)))
 (define (table #:align [align #f] . rows) (node-table align rows))
 (define (header-row . cells) (node-header-row cells))
 (define (row . cells) (node-row cells))
-(define (cell line) (node-cell (list line)))
-(define (cell-multi-line lines) (node-cell lines))
-(define (list-ordered . items) (node-list-ordered items))
+(define (cell line) (node-cell (list (->inlines line))))
+(define (cell-multi-line lines) (node-cell (map ->inlines lines)))
+(define (list-ordered . items) (node-list-ordered (map ->inlines items)))
 
 ;; inline
 (define (code-inline s) (node-code-inline s))
-(define (italic . xs) (node-italic xs))
-(define (bold . xs) (node-bold xs))
-(define (with-delete-line . xs) (node-strike xs))
+(define (italic . xs) (node-italic (->inlines xs)))
+(define (bold . xs) (node-bold (->inlines xs)))
+(define (with-delete-line . xs) (node-strike (->inlines xs)))
 (define ($ tex) (node-inline-math tex))
-(define (hyperlink text url #:title [title #f]) (node-hyperlink text url title))
+(define (hyperlink text url #:title [title #f]) (node-hyperlink (->inlines text) url title))
 
 ;; site 级
 (define (posts-list #:count [count +inf.0]) (node-posts-list count))

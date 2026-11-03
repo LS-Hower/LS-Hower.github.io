@@ -74,9 +74,38 @@
     (error "render-html: 期望 node-date，得到" d))
   (format "~a-~a-~a" (pad2 (node-date-year d)) (pad2 (node-date-month d)) (pad2 (node-date-day d))))
 
+;; 图片尺寸：数字解释为 em（相对文字高度），字符串按 CSS 原样
+(define (css-length v)
+  (if (number? v) (format "~aem" v) v))
+
+;; ---------- 缩进 ----------
+
+;; 一行“行”指不含换行的文本；块渲染器统一产出 (listof string)，
+;; 由 at 统一加上缩进，最后 join-lines 拼成最终文本。
+;; 唯一例外是 <pre> 里的代码：其内部换行属于内容，不再被缩进。
+
+(define indent-unit "  ")
+
+(define (indent level)
+  (cond
+    [(zero? level) ""]
+    [else (string-append indent-unit (indent (sub1 level)))]))
+
+;; 给若干行套上某一层的缩进；空行保持为空行（不留行尾空白）
+(define (at level lines)
+  (cond
+    [(zero? level) lines]
+    [else
+     (for/list ([line (in-list lines)])
+       (if (string=? line "") "" (string-append (indent level) line)))]))
+
+(define (join-lines lines)
+  (string-append* (for/list ([line (in-list lines)]) (string-append line "\n"))))
+
 ;; ---------- 内联渲染 ----------
 
-(define (render-inline x)  (cond
+(define (render-inline x)
+  (cond
     [(string? x) (escape-text (collapse-ws x))]
     [(node-code-inline? x)
      (format "<code>~a</code>" (escape-text (node-code-inline-code x)))]
@@ -91,14 +120,15 @@
     [(node-hyperlink? x)
      (define url (escape-attr (node-hyperlink-url x)))
      (define title (node-hyperlink-title x))
-     (define text (render-inlines (list (node-hyperlink-text x))))
+     (define text (render-inlines (node-hyperlink-text x)))
      (if title
          (format "<a href=\"~a\" title=\"~a\">~a</a>" url (escape-attr title) text)
          (format "<a href=\"~a\">~a</a>" url text))]
     [else (error "render-html: 未知的内联节点" x)]))
 
+;; xs 是内联序列（list），由 notation.rkt 保证
 (define (render-inlines xs)
-  (apply string-append (map render-inline (pangu-inlines xs))))
+  (string-append* (map render-inline (pangu-inlines xs))))
 
 (define (inline-node? x)
   (or (string? x)
@@ -111,33 +141,33 @@
 
 ;; ---------- 自动节点 ----------
 
-(define (render-posts-list count)
-  (define posts (current-posts))
-  (define shown (if (and (number? count) (< (length posts) count)) posts (take* posts count)))
-  (string-append
-   "<ul class=\"post-list\">\n"
-   (apply string-append
-          (for/list ([p (in-list shown)])
-            (format "  <li><time>~a</time> <a href=\"~a\">~a</a></li>\n"
-                    (format-date (post-rec-publish-date p))
-                    (escape-attr (post-url p))
-                    (escape-text (post-rec-title p)))))
-   "</ul>\n"))
-
-(define (take* xs n)
+(define (take-up-to xs n)
   (cond
+    [(not (number? n)) xs]
     [(>= (length xs) n) (take xs n)]
     [else xs]))
 
-(define (render-page-links)
-  (string-append
-   "<ul class=\"page-links\">\n"
-   (apply string-append
-          (for/list ([p (in-list (current-flat-pages))])
-            (format "  <li><a href=\"~a\">~a</a></li>\n"
-                    (escape-attr (flat-page-url p))
-                    (escape-text (flat-page-rec-title p)))))
-   "</ul>\n"))
+(define (posts-list-lines count level)
+  (define shown (take-up-to (current-posts) count))
+  (append
+   (at level (list "<ul class=\"post-list\">"))
+   (at (add1 level)
+       (for/list ([p (in-list shown)])
+         (format "<li><time>~a</time> <a href=\"~a\">~a</a></li>"
+                 (format-date (post-rec-publish-date p))
+                 (escape-attr (post-url p))
+                 (escape-text (post-rec-title p)))))
+   (at level (list "</ul>"))))
+
+(define (page-links-lines level)
+  (append
+   (at level (list "<ul class=\"page-links\">"))
+   (at (add1 level)
+       (for/list ([p (in-list (current-flat-pages))])
+         (format "<li><a href=\"~a\">~a</a></li>"
+                 (escape-attr (flat-page-url p))
+                 (escape-text (flat-page-rec-title p)))))
+   (at level (list "</ul>"))))
 
 ;; ---------- 代码 / 表格 / 终端输出 ----------
 
@@ -155,10 +185,11 @@
     [(node-header-row? r) (node-header-row-cells r)]
     [else (error "render-html: 期望 row 或 header-row，得到" r)]))
 
-(define (render-cell-lines lines)
+;; cell 的 lines 是内联序列的列表，行与行之间用 <br> 连接
+(define (render-cell c)
   (string-join
-   (for/list ([line (in-list lines)])
-     (if (list? line) (render-inlines line) (render-inline line)))
+   (for/list ([line (in-list (node-cell-lines c))])
+     (render-inlines line))
    "<br>"))
 
 (define (table-align align-list col)
@@ -173,10 +204,6 @@
     [(right) "text-align:right"]
     [else (error "render-html: 未知的对齐" a)]))
 
-;; 图片尺寸：数字解释为 em（相对文字高度），字符串按 CSS 原样
-(define (css-length v)
-  (if (number? v) (format "~aem" v) v))
-
 (define (image-size-style b)
   (define parts
     (filter identity
@@ -186,105 +213,124 @@
                        (format "height:~a" (css-length (node-image-height b)))))))
   (if (empty? parts) "" (format " style=\"~a\"" (string-join parts ";"))))
 
-(define (render-table t)
+(define (table-lines t level)
   (define align-list (node-table-align t))
-  (define headers (filter node-header-row? (node-table-rows t)))
-  (define bodies (filter node-row? (node-table-rows t)))
-  (define (render-row r header?)
+  (define header-rows (filter node-header-row? (node-table-rows t)))
+  (define body-rows (filter node-row? (node-table-rows t)))
+  (define (row-lines r header? row-level)
     (define tag (if header? "th" "td"))
-    (string-append
-     "<tr>\n"
-     (apply string-append
-            (for/list ([c (in-list (row-cells r))] [col (in-naturals)])
-              (format "  <~a style=\"~a\">~a</~a>\n"
-                      tag
-                      (align-attr (table-align align-list col))
-                      (render-cell-lines (node-cell-lines c))
-                      tag)))
-     "</tr>\n"))
-  (string-append
-   "<table>\n"
-   (if (empty? headers)
-       ""
-       (string-append "<thead>\n"
-                      (apply string-append (map (lambda (r) (render-row r #t)) headers))
-                      "</thead>\n"))
-   (if (empty? bodies)
-       ""
-       (string-append "<tbody>\n"
-                      (apply string-append (map (lambda (r) (render-row r #f)) bodies))
-                      "</tbody>\n"))
-   "</table>\n"))
+    (append
+     (at row-level (list "<tr>"))
+     (at (add1 row-level)
+         (for/list ([c (in-list (row-cells r))] [col (in-naturals)])
+           (format "<~a style=\"~a\">~a</~a>"
+                   tag
+                   (align-attr (table-align align-list col))
+                   (render-cell c)
+                   tag)))
+     (at row-level (list "</tr>"))))
+  (append
+   (at level (list "<table>"))
+   (if (empty? header-rows)
+       '()
+       (append (at (add1 level) (list "<thead>"))
+               (append* (for/list ([r (in-list header-rows)]) (row-lines r #t (+ level 2))))
+               (at (add1 level) (list "</thead>"))))
+   (if (empty? body-rows)
+       '()
+       (append (at (add1 level) (list "<tbody>"))
+               (append* (for/list ([r (in-list body-rows)]) (row-lines r #f (+ level 2))))
+               (at (add1 level) (list "</tbody>"))))
+   (at level (list "</table>"))))
 
 ;; ---------- 块渲染（含 section 自动编号） ----------
 
-;; prefix :: (listof integer)，表示当前章节号前缀
-(define (render-blocks blocks prefix numbered?)
+;; 返回行列表；prefix 是当前章节号前缀（(listof integer)）
+(define (blocks-lines blocks prefix numbered? level)
   (define counter (box 0))
-  (apply string-append
-         (for/list ([b (in-list blocks)])
-           (cond
-             [(node-section? b)
-              (set-box! counter (add1 (unbox counter)))
-              (define number (append prefix (list (unbox counter))))
-              (define level (min 6 (add1 (length number))))
-              (define numstr (string-join (map number->string number) "."))
-              (define id (format "sec-~a" (string-join (map number->string number) "-")))
-              (define title
-                (if numbered?
-                    (format "~a ~a" numstr (escape-text (node-section-title b)))
-                    (escape-text (node-section-title b))))
-              (string-append
-               (format "<h~a id=\"~a\">~a</h~a>\n" level id title level)
-               (render-blocks (node-section-body b) number numbered?))]
-             [(node-paragraph? b)
-              (format "<p>~a</p>\n" (render-inlines (node-paragraph-inlines b)))]
-             [(node-quote-block? b)
-              (format "<blockquote>\n~a</blockquote>\n"
-                      (render-blocks (node-quote-block-body b) prefix numbered?))]
-             [(node-code-block? b)
-              (define lang (node-code-block-lang b))
-              (define class (if lang (format " class=\"language-~a\"" (escape-attr lang)) ""))
-              (format "<pre><code~a>~a</code></pre>\n" class
-                      (escape-text (code-block-content b)))]
-             [(node-display-math? b)
-              (format "<p class=\"math-display\">\\[~a\\]</p>\n"
-                      (escape-text (node-display-math-tex b)))]
-             [(node-horizontal-line? b) "<hr>\n"]
-             [(node-table? b) (render-table b)]
-             [(node-list-ordered? b)
-              (string-append
-               "<ol>\n"
-               (apply string-append
-                      (for/list ([item (in-list (node-list-ordered-items b))])
-                        (format "  <li>~a</li>\n"
-                                (if (list? item) (render-inlines item) (render-inline item)))))
-               "</ol>\n")]
-             [(node-list-unordered? b)
-              (string-append
-               "<ul>\n"
-               (apply string-append
-                      (for/list ([item (in-list (node-list-unordered-items b))])
-                        (format "  <li>~a</li>\n"
-                                (if (list? item) (render-inlines item) (render-inline item)))))
-               "</ul>\n")]
-             [(node-image? b)
-              (define img
-                (format "<img src=\"~a\" alt=\"~a\"~a~a>"
-                        (escape-attr (node-image-src b))
-                        (escape-attr (node-image-alt b))
-                        (if (node-image-title b)
-                            (format " title=\"~a\"" (escape-attr (node-image-title b)))
-                            "")
-                        (image-size-style b)))
-              (if (node-image-caption b)
-                  (format "<figure>\n  ~a\n  <figcaption>~a</figcaption>\n</figure>\n"
-                          img (escape-text (node-image-caption b)))
-                  (format "<p>~a</p>\n" img))]
-             [(node-posts-list? b) (render-posts-list (node-posts-list-count b))]
-             [(node-page-links? b) (render-page-links)]
-             [(inline-node? b) (format "<p>~a</p>\n" (render-inline b))]
-             [else (error "render-html: 未知的块节点" b)]))))
+  (append*
+   (for/list ([b (in-list blocks)])
+     (block-lines b counter prefix numbered? level))))
+
+(define (block-lines b counter prefix numbered? level)
+  (cond
+    [(node-section? b)
+     (set-box! counter (add1 (unbox counter)))
+     (define number (append prefix (list (unbox counter))))
+     (define hlevel (min 6 (add1 (length number))))
+     (define numstr (string-join (map number->string number) "."))
+     (define anchor (format "sec-~a" (string-join (map number->string number) "-")))
+     (define heading (escape-text (node-section-title b)))
+     (define text (if numbered? (format "~a ~a" numstr heading) heading))
+     (append
+      (at level (list (format "<h~a id=\"~a\">~a</h~a>" hlevel anchor text hlevel)))
+      (blocks-lines (node-section-body b) number numbered? level))]
+
+    [(node-paragraph? b)
+     (at level (list (format "<p>~a</p>" (render-inlines (node-paragraph-inlines b)))))]
+
+    [(node-quote-block? b)
+     (append
+      (at level (list "<blockquote>"))
+      (blocks-lines (node-quote-block-body b) prefix numbered? (add1 level))
+      (at level (list "</blockquote>")))]
+
+    [(node-code-block? b)
+     (define lang (node-code-block-lang b))
+     (define class (if lang (format " class=\"language-~a\"" (escape-attr lang)) ""))
+     ;; 代码内部的换行是内容，只有起始行跟随缩进
+     (at level (list (format "<pre><code~a>~a</code></pre>"
+                             class
+                             (escape-text (code-block-content b)))))]
+
+    [(node-display-math? b)
+     (at level (list (format "<p class=\"math-display\">\\[~a\\]</p>"
+                             (escape-text (node-display-math-tex b)))))]
+
+    [(node-horizontal-line? b)
+     (at level (list "<hr>"))]
+
+    [(node-table? b)
+     (table-lines b level)]
+
+    [(or (node-list-unordered? b) (node-list-ordered? b))
+     (define ordered? (node-list-ordered? b))
+     (define tag (if ordered? "ol" "ul"))
+     (define items (if ordered? (node-list-ordered-items b) (node-list-unordered-items b)))
+     (append
+      (at level (list (format "<~a>" tag)))
+      (at (add1 level)
+          (for/list ([item (in-list items)])
+            (format "<li>~a</li>" (render-inlines item))))
+      (at level (list (format "</~a>" tag))))]
+
+    [(node-image? b)
+     (define img
+       (format "<img src=\"~a\" alt=\"~a\"~a~a>"
+               (escape-attr (node-image-src b))
+               (escape-attr (node-image-alt b))
+               (if (node-image-title b)
+                   (format " title=\"~a\"" (escape-attr (node-image-title b)))
+                   "")
+               (image-size-style b)))
+     (if (node-image-caption b)
+         (append
+          (at level (list "<figure>"))
+          (at (add1 level) (list img (format "<figcaption>~a</figcaption>"
+                                             (escape-text (node-image-caption b)))))
+          (at level (list "</figure>")))
+         (at level (list (format "<p>~a</p>" img))))]
+
+    [(node-posts-list? b)
+     (posts-list-lines (node-posts-list-count b) level)]
+
+    [(node-page-links? b)
+     (page-links-lines level)]
+
+    [(inline-node? b)
+     (at level (list (format "<p>~a</p>" (render-inline b))))]
+
+    [else (error "render-html: 未知的块节点" b)]))
 
 ;; ---------- 前后篇导航 ----------
 
@@ -301,61 +347,54 @@
               (post-url p) (escape-text (post-rec-title p)))
       "<span class=\"next\">› 更早的一篇：无</span>"))
 
-(define (prev-next-nav)
+(define (post-nav-lines level)
   (define posts (current-posts))
-  (define name (current-output-name))
-  (if (empty? posts)
-      ""
-      (let ([idx (index-of (map post-rec-name posts) name)])
-        (if idx
-            (let ([newer (and (> idx 0) (list-ref posts (sub1 idx)))]
-                  [older (and (< idx (sub1 (length posts))) (list-ref posts (add1 idx)))])
-              (string-append
-               "<nav class=\"post-nav\">"
-               (prev-link newer)
-               (next-link older)
-               "</nav>\n"))
-            ""))))
+  (define idx (and (pair? posts)
+                   (index-of (map post-rec-name posts) (current-output-name))))
+  (cond
+    [(not idx) '()]
+    [else
+     (define newer (and (> idx 0) (list-ref posts (sub1 idx))))
+     (define older (and (< idx (sub1 (length posts))) (list-ref posts (add1 idx))))
+     (append
+      (at level (list "<nav class=\"post-nav\">"))
+      (at (add1 level) (list (prev-link newer) (next-link older)))
+      (at level (list "</nav>")))]))
 
 ;; ---------- 数学 ----------
 
-;; 扫描 AST，判断是否包含内联/展示数学节点
+;; 扫描 AST，判断是否包含内联/展示数学节点。
+;; 用 struct->vector 做泛型遍历，新增节点类型不必再来这里补分支。
 (define (contains-math? x)
   (cond
     [(node-inline-math? x) #t]
     [(node-display-math? x) #t]
     [(list? x) (ormap contains-math? x)]
-    [(node-document? x) (contains-math? (node-document-body x))]
-    [(node-section? x) (contains-math? (node-section-body x))]
-    [(node-paragraph? x) (contains-math? (node-paragraph-inlines x))]
-    [(node-quote-block? x) (contains-math? (node-quote-block-body x))]
-    [(node-list-unordered? x) (contains-math? (node-list-unordered-items x))]
-    [(node-bold? x) (contains-math? (node-bold-inlines x))]
-    [(node-italic? x) (contains-math? (node-italic-inlines x))]
-    [(node-strike? x) (contains-math? (node-strike-inlines x))]
+    [(struct? x) (ormap contains-math? (cdr (vector->list (struct->vector x))))]
     [else #f]))
 
-(define (math-scripts engine)
-  (case engine
-    [(none) ""]
-    [(katex)
-     (string-append
-      "    <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css\">\n"
-      "    <script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js\"></script>\n"
-      "    <script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js\"\n"
-      "      onload=\"renderMathInElement(document.body, {delimiters:[{left:'\\\\(' , right:'\\\\)', display:false},{left:'\\\\[', right:'\\\\]', display:true}], throwOnError:false});\"></script>\n")]
-    [(mathjax)
-     (string-append
-      "    <script>\n"
-      "      window.MathJax = {tex: {inlineMath: [['\\\\(', '\\\\)']], displayMath: [['\\\\[', '\\\\]']]}};\n"
-      "    </script>\n"
-      "    <script defer src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js\"></script>\n")]
-    [else (error "render-html: 未知的数学引擎" engine)]))
+(define (math-scripts-lines engine level)
+  (at level
+      (case engine
+        [(none) '()]
+        [(katex)
+         (list
+          "<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css\">"
+          "<script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js\"></script>"
+          "<script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js\""
+          "  onload=\"renderMathInElement(document.body, {delimiters:[{left:'\\\\(' , right:'\\\\)', display:false},{left:'\\\\[', right:'\\\\]', display:true}], throwOnError:false});\"></script>")]
+        [(mathjax)
+         (list
+          "<script>"
+          "  window.MathJax = {tex: {inlineMath: [['\\\\(', '\\\\)']], displayMath: [['\\\\[', '\\\\]']]}};"
+          "</script>"
+          "<script defer src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js\"></script>")]
+        [else (error "render-html: 未知的数学引擎" engine)])))
 
 ;; ---------- 页面外壳 ----------
 
 ;; 页面顶部元信息块（发布/更新日期等）。字段可扩展，缺失的自动跳过。
-(define (meta-block meta)
+(define (meta-field-lines meta level)
   (define fields
     (list
      (cons "发布日期"
@@ -366,14 +405,15 @@
            (and (node-metadata-update-date meta)
                 (format "<time>~a</time>"
                         (format-date (node-metadata-update-date meta)))))))
-  (define lines
-    (for/list ([f (in-list fields)] #:when (cdr f))
-      (format "  ~a：~a" (car f) (cdr f))))
-  (if (empty? lines)
-      ""
-      (string-append "<div class=\"page-meta\">\n"
-                     (string-join lines "\n")
-                     "\n</div>\n")))
+  (define shown (filter cdr fields))
+  (if (empty? shown)
+      '()
+      (append
+       (at level (list "<div class=\"page-meta\">"))
+       (at (add1 level)
+           (for/list ([f (in-list shown)])
+             (format "~a：~a" (car f) (cdr f))))
+       (at level (list "</div>")))))
 
 (define (render-document doc)
   (unless (node-document? doc)
@@ -382,44 +422,51 @@
   (define title (node-metadata-title meta))
   (define base (current-base))
   (define body (node-document-body doc))
-  (define body-html (render-blocks body '() (node-metadata-numbered meta)))
-  (define home? (not (equal? (current-output-name) "index")))
-  (define index-url (string-append base "index.html"))
+  (define numbered? (node-metadata-numbered meta))
+  (define index-page? (equal? (current-output-name) "index"))
   (define has-math? (contains-math? body))
-  (define page-engine (node-metadata-math meta))
-  (define eff-engine (if (eq? page-engine 'auto) (current-math-engine) page-engine))
-  (when (and has-math? (eq? eff-engine 'none))
+  (define engine (let ([m (node-metadata-math meta)])
+                   (if (eq? m 'auto) (current-math-engine) m)))
+  (when (and has-math? (eq? engine 'none))
     (eprintf "WARNING: 页面“~a”使用了数学节点，但没有设置数学引擎（metadata #:math 或站级配置），公式将不会渲染。\n" title))
-  (string-append
-   "<!DOCTYPE html>\n\n"
-   "<html lang=\"zh\">\n"
-   "  <head>\n"
-   (format "    <meta charset=\"UTF-8\">\n")
-   (format "    <title>~a - ~a</title>\n" (escape-text title) (escape-text (current-site-title)))
-   (format "    <link href=\"~a\" rel=\"stylesheet\" id=\"css\">\n"
-           (escape-attr (string-append base (current-css-path))))
-   (format "    <link rel=\"shortcut icon\" href=\"~a\">\n"
-           (escape-attr (string-append base (current-favicon))))
-   (if (and (current-author) (not (equal? (current-author) "")))
-       (format "    <meta name=\"author\" content=\"~a\">\n" (escape-attr (current-author)))
-       "")
-   (if (and has-math? (not (eq? eff-engine 'none)))
-       (math-scripts eff-engine)
-       "")
-   "  </head>\n\n"
-   "  <body>\n"
-   (format "    <header>\n      <h1>~a - ~a</h1>\n"
-           (escape-text title) (escape-text (current-site-title)))
-   (if home?
-       (format "      <a class=\"home-button\" href=\"~a\">回到首页</a>\n" (escape-attr index-url))
-       "")
-   ;; 文章页：更晚/更早的一篇、元信息都在标题下方、水平线之上；站点页两者为空
-   (prev-next-nav)
-   (meta-block meta)
-   "    </header>\n"
-   "    <hr>\n\n"
-   "    <main>\n"
-   body-html
-   "    </main>\n"
-   "  </body>\n"
-   "</html>\n"))
+  (define lines
+    (append
+     (at 0 (list "<html lang=\"zh\">"))
+     (at 1 (list "<head>"))
+     (at 2 (list
+            "<meta charset=\"UTF-8\">"
+            (format "<title>~a - ~a</title>"
+                    (escape-text title) (escape-text (current-site-title)))
+            (format "<link href=\"~a\" rel=\"stylesheet\" id=\"css\">"
+                    (escape-attr (string-append base (current-css-path))))
+            (format "<link rel=\"shortcut icon\" href=\"~a\">"
+                    (escape-attr (string-append base (current-favicon))))))
+     (if (and (current-author) (not (equal? (current-author) "")))
+         (at 2 (list (format "<meta name=\"author\" content=\"~a\">"
+                             (escape-attr (current-author)))))
+         '())
+     (if (and has-math? (not (eq? engine 'none)))
+         (math-scripts-lines engine 2)
+         '())
+     (at 1 (list "</head>"))
+     (list "")
+     (at 1 (list "<body>"))
+     (at 2 (list "<header>"))
+     (at 3 (list (format "<h1>~a - ~a</h1>"
+                         (escape-text title) (escape-text (current-site-title)))))
+     (if index-page?
+         '()
+         (at 3 (list (format "<a class=\"home-button\" href=\"~a\">回到首页</a>"
+                             (escape-attr (string-append base "index.html"))))))
+     ;; 文章页：更晚/更早的一篇、元信息都在标题下方、水平线之上；站点页两者为空
+     (post-nav-lines 3)
+     (meta-field-lines meta 3)
+     (at 2 (list "</header>"))
+     (at 2 (list "<hr>"))
+     (list "")
+     (at 2 (list "<main>"))
+     (blocks-lines body '() numbered? 3)
+     (at 2 (list "</main>"))
+     (at 1 (list "</body>"))
+     (at 0 (list "</html>"))))
+  (string-append "<!DOCTYPE html>\n\n" (join-lines lines)))

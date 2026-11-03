@@ -39,6 +39,29 @@ racket tools/build.rkt
 
 文章页与站点页使用一种基于 Racket 的表记方法写成，它们的源代码也是合法的 Racket 源代码。至于用法，没有文档，源代码先凑合着看吧： `tools/notation.rkt` 。
 
+## 测试
+
+### 环境要求
+
+- [Racket](https://racket-lang.org/) （含内置的 `rackunit`）。
+
+### 命令
+
+仓库根目录：
+
+```bash
+raco test tests
+```
+
+### 覆盖范围
+
+- `tests/notation.rkt` ：记号层的内联序列规范化。
+- `tests/pangu.rkt` ：盘古之白的空格规则。
+- `tests/render.rkt` ：HTML 渲染的断言（转义、缩进层级、表格、列表、导航、数学脚本等）。
+- `tests/site.rkt` ：把源文件复制到临时目录完整构建一遍，检查产物与源文件一一对应、页面骨架完整、锚点唯一、站内链接都落到实际文件。
+
+渲染测试断言的是片段而非整页快照，所以排版微调不会让测试变得满屏噪音。
+
 ## 部署
 
 ### 环境要求

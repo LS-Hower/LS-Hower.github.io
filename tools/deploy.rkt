@@ -46,7 +46,7 @@
   (current-directory repo-root)
 
   (displayln "==> 构建站点")
-  (run (find-system-path 'exec-file)
+  (run (path->string (find-system-path 'exec-file))
        (path->string (build-path repo-root "tools" "build.rkt")))
 
   (define origin-url (capture "git remote get-url origin"))
